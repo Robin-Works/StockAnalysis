@@ -1,1 +1,1 @@
-# StockAnalysis
+This is an application intended to hit certain API's that return Stock information so I can use them for analysis.
