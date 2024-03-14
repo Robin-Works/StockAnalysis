@@ -13,6 +13,15 @@
             <a href="/login">Login</a>
         </div>
         <hr>
+        {% with messages =  get_flashed_messages() %} <!-- With construct assigns value from get_flashed_messages to messages -->
+        {% if messages %} <!-- Messages cleared after calling (think of a channel) -->
+        <ul>
+            {% for m in messages %}
+            <il>{{ m }}</il>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </body>
 </html>

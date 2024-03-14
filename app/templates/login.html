@@ -2,8 +2,8 @@
 
 {% block content %}
     <h1>Sign In</h1>
-    <form action="" method="post" novalidate> <!-- action tells browser to submit form to current URL b/c empty-->
-    <!-- novalidate is included so server side validation can be done later-->
+    <form action="" method="post" novalidate> <!-- action tells browser to submit form to current URL b/c empty -->
+    <!-- novalidate is included so server side validation can be done later -->
         {{ form.hidden_tag() }} <!-- included to encrypt field using SECRET_KEY -->
         <p>
             {{ form.username.label }}<br>
