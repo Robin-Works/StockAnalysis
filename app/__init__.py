@@ -12,4 +12,4 @@ migrate = Migrate(app, db) # migrate engine associated with the app
 login = LoginManager(app)
 login.login_view = "login" # specifies endpoint for logging in
 
-from app import routes, models
+from app import routes, models, errors

@@ -63,6 +63,16 @@ def login():
     # passes form object to template with name form
     return render_template("login.html", title="Sign In", form=form)
 
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = db.first_or_404(sqlA.select(User).where(User.username == username))
+    posts = [
+        {"author": user, "body": "Test Post #1"},
+        {"author": user, "body": "Test Post #2"}
+    ]
+    return render_template("user.html", user=user, posts=posts)
+
 @app.route("/logout")
 def logout():
     logout_user()
