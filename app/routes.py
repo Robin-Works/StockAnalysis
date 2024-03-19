@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sqlA
 from app import db
@@ -63,7 +63,7 @@ def login():
     # passes form object to template with name form
     return render_template("login.html", title="Sign In", form=form)
 
-@app.route('/user/<username>')
+@app.route("/user/<username>")
 @login_required
 def user(username):
     user = db.first_or_404(sqlA.select(User).where(User.username == username))
@@ -72,6 +72,20 @@ def user(username):
         {"author": user, "body": "Test Post #2"}
     ]
     return render_template("user.html", user=user, posts=posts)
+
+@app.route("/editProfile", methods=["GET", "POST"])
+def editProfile():
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.aboutMe = form.aboutMe.data
+        db.session.commit()
+        flash("Your changes have been saved!")
+        return redirect(url_for("editProfile"))
+    elif request.method == "GET":
+        form.username.data = current_user.username
+        form.aboutMe.data = current_user.aboutMe
+    return render_template("editProfile.html", title="Edit Profile", form=form)
 
 @app.route("/logout")
 def logout():

@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>User: {{ user.username }}</h1>
+    <table>
+        <tr valign="top">
+            <td>
+                <h1>User: {{ user.username }}</h1>
+                {% if user.aboutMe %}<p>{{ user.aboutMe }}</p>{% endif %}
+                {% if user == current_user %}
+                <p><a href="{{ url_for('editProfile') }}">Edit your profile</a></p>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
     <hr>
     {% for p in posts %}
     <p>

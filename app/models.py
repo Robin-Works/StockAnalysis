@@ -16,6 +16,8 @@ class User(UserMixin, db.Model):
     
     posts: sqlOrm.WriteOnlyMapped["Post"] = sqlOrm.relationship(back_populates="author")
     
+    aboutMe: sqlOrm.Mapped[Optional[str]] = sqlOrm.mapped_column(sqlA.String(140))
+    
     def setPassword(self, password):
         self.passHash = generate_password_hash(password)
         
