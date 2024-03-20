@@ -6,11 +6,13 @@ import sqlalchemy as sqlA
 from app import db
 from app.models import User
 from urllib.parse import urlsplit
+from app.stocks import fetchSPData
 
 # Decorators which define the app route, both decorate the index function
-@app.route("/api/v1")
+@app.route("/api/v1/stonks")
 def apiV1():
-    return "This will do something at some point I hope"
+    companies = fetchSPData()
+    return companies.to_html()
 
 @app.route("/index")
 @login_required
