@@ -1,6 +1,6 @@
 import pandas as pd
 from pytrends.request import TrendReq
-import datetime
+from datetime import datetime, timedelta
 import yfinance as yf
 import time
 
@@ -14,18 +14,37 @@ def fetchSPData() -> pd.DataFrame:
     return sp500
 
 def fetchOptionData(sp500Data: pd.DataFrame) -> pd.DataFrame:
+    # Grab symbol for options data in sp500 data frame
     symbol = sp500Data.at[0, "Symbol"]
     stock = yf.Ticker(symbol)
     stockData = stock.history(period="1m")
-    optionsDates = stock.options
+    
+    # Get today's date plus 6 months from now for relevant options data I want
+    today = datetime.today()
+    sixMonths = today + timedelta(days=182)
+    
+    optionsDates = [date for date in stock.options if datetime.strptime(date, "%Y-%m-%d") <= sixMonths]
     optionsData = pd.DataFrame()
+    
+    relevantCols = ["contractSymbol", "strike", "lastPrice", "bid", "ask", "percentChange", "volume", "openInterest", "impliedVolatility", "inTheMoney", "delta", "gamma", "theta", "vega"]
     
     for date in optionsDates:
         optChain = stock.option_chain(date)
         
-        optChainCombo = pd.concat([optChain.calls, optChain.puts], keys=["calls", "puts"])
-        optChainCombo["expiration_date"] = date
-        optionsData = pd.concat([optionsData, optChainCombo])
+        # Only grab call and puts where volume is greater than 5
+        relevantCalls = optChain.calls[optChain.calls["volume"] > 5].copy()
+        relevantPuts = optChain.puts[optChain.puts["volume"] > 5].copy()
+        relevantCalls["contract_type"] = "call"
+        relevantPuts["contract_type"] = "put"
+        
+        filteredRelCols = [col for col in relevantCols if col in relevantCalls.columns and col in relevantPuts.columns]
+        
+        relevantCalls = relevantCalls[filteredRelCols]
+        relevantPuts = relevantPuts[filteredRelCols]
+        
+        combinedData = pd.concat([relevantCalls, relevantPuts], keys=["calls", "puts"])
+        combinedData["expiration_date"] = date
+        optionsData = pd.concat([optionsData, combinedData])
         
     return optionsData
 
