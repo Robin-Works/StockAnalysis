@@ -6,16 +6,17 @@ import sqlalchemy as sqlA
 from app import db
 from app.models import User
 from urllib.parse import urlsplit
-from app.stocks import fetchSPData, fetchTrendData
+from app.stocks import fetchSPData, fetchTrendData, fetchOptionData
 
 # Decorator which defines the api I would like to implement for my app
 @app.route("/api/v1/stonks")
 def apiV1():
     companies = fetchSPData()
+    options = fetchOptionData(companies)
     
     # currently, pytrends is broken so this won't work :(
     # trendsDict = fetchTrendData(companies)
-    return companies.to_dict()
+    return options.to_html()
 
 # Index route renders index.html with a test post
 @app.route("/index")

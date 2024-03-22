@@ -1,7 +1,7 @@
 import pandas as pd
 from pytrends.request import TrendReq
 import datetime
-from selenium import webdriver
+import yfinance as yf
 import time
 
 # Function to fetch S&P500 data from wikipedia
@@ -12,6 +12,22 @@ def fetchSPData() -> pd.DataFrame:
     sp500 = df[["Symbol", "Security"]]
     
     return sp500
+
+def fetchOptionData(sp500Data: pd.DataFrame) -> pd.DataFrame:
+    symbol = sp500Data.at[0, "Symbol"]
+    stock = yf.Ticker(symbol)
+    stockData = stock.history(period="1m")
+    optionsDates = stock.options
+    optionsData = pd.DataFrame()
+    
+    for date in optionsDates:
+        optChain = stock.option_chain(date)
+        
+        optChainCombo = pd.concat([optChain.calls, optChain.puts], keys=["calls", "puts"])
+        optChainCombo["expiration_date"] = date
+        optionsData = pd.concat([optionsData, optChainCombo])
+        
+    return optionsData
 
 # Currently pytrends doesn't work so this will have to hold off :(
 def fetchTrendData(sp500Data: pd.DataFrame) -> dict:
