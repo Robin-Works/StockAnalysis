@@ -6,17 +6,40 @@ import sqlalchemy as sqlA
 from app import db
 from app.models import User
 from urllib.parse import urlsplit
-from app.stocks import fetchSPData, fetchTrendData, fetchOptionData
+from app.stocks import fetchSPData, fetchCallPutData, preprocessOptionsData
+from app.plots import createBokehPlot
 
 # Decorator which defines the api I would like to implement for my app
-@app.route("/api/v1/stonks")
+@app.route("/api/v1/stocks")
 def apiV1():
-    companies = fetchSPData()
-    options = fetchOptionData(companies)
+    sp500Data = fetchSPData()
     
-    # currently, pytrends is broken so this won't work :(
-    # trendsDict = fetchTrendData(companies)
-    return options.to_html()
+    return render_template("stockList.html", stocks=sp500Data.to_dict("records"))
+
+@app.route("/api/v1/stocks/calls/<symbol>")
+def apiV1Calls(symbol):
+    # Grab call data and clean it
+    dataDirty = fetchCallPutData(symbol=symbol, tradeType="calls")
+    data = preprocessOptionsData(dataDirty)
+    
+    ivScript, ivDiv = createBokehPlot(data, "strike", "impliedVolatility", f"Implied Volatility vs Strike Price for Call of {symbol}", line=True)
+    volScript, volDiv = createBokehPlot(data, "strike", "volume", f"Volume vs Strike Price for Call of {symbol}", plotType="bar")
+    oiScript, oiDiv = createBokehPlot(data, "strike", "openInterest", f"Open Interest vs Strike Price for Call of {symbol}", plotType="bar")
+    
+    return render_template("plot.html", symbol=symbol, ivScript=ivScript, volScript=volScript, oiScript=oiScript, ivDiv=ivDiv, volDiv=volDiv, oiDiv=oiDiv)
+
+@app.route("/ap1/v1/stocks/puts/<symbol>")
+def apiV1Puts(symbol):
+    # Grab put data and clean it
+    dataDirty = fetchCallPutData(symbol=symbol, tradeType="puts")
+    data = preprocessOptionsData(dataDirty)
+    
+    ivScript, ivDiv = createBokehPlot(data, "strike", "impliedVolatility", f"Implied Volatility vs Strike Price for Put of {symbol}", line=True)
+    volScript, volDiv = createBokehPlot(data, "strike", "volume", f"Volume vs Strike Price for Put of {symbol}", plotType="bar")
+    oiScript, oiDiv = createBokehPlot(data, "strike", "openInterest", f"Open Interest vs Strike Price for Put of {symbol}", plotType="bar")
+    
+    return render_template("plot.html", symbol=symbol, ivScript=ivScript, volScript=volScript, oiScript=oiScript, ivDiv=ivDiv, volDiv=volDiv, oiDiv=oiDiv)
+    
 
 # Index route renders index.html with a test post
 @app.route("/index")

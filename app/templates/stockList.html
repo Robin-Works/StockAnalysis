@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>S&P500 Stocks</h2>
+<ul>
+    {% for s in stocks %}
+    <li>{{ s.Security }} ({{ s.Symbol }})
+        - <a href="{{ url_for('apiV1Calls', symbol=s.Symbol) }}">Calls</a>
+        - <a href="{{ url_for('apiV1Puts', symbol=s.Symbol) }}">Puts</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

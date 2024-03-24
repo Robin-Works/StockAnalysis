@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    {{ ivScript|safe }}
+    {{ volScript|safe }}
+    {{ oiScript|safe }}
+    <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.css" type="text/css" />
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js"></script>
+</head>
+<body>
+    <h1>Options Data for {{ symbol }} over the next 6 months.</h1>
+    <div>{{ ivDiv|safe }}</div>
+    <div>{{ volDiv|safe }}</div>
+    <div>{{ oiDiv|safe }}</div>
+</body>
+{% endblock %}

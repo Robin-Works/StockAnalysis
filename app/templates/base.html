@@ -8,8 +8,9 @@
         {% endif %}
     </head>
     <body>
-        <div>Stonks: 
+        <div>Stocks: 
             <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('apiV1')}}">Stocks</a>
             {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Login</a>
             {% else %}
